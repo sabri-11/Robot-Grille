@@ -123,6 +123,14 @@ class Grille:
         center_y = self.yt + (y * self.t_cases) + (self.t_cases // 2)
 
         pygame.draw.circle(self.screen, BONUS_COLOR, (center_x, center_y), self.t_robot // 2)
+
+    def reset(self):
+        self.gain = 0
+        self.dessiner_robot()
+
+    def step(self):
+        pass
+        
     
 
 
