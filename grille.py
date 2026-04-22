@@ -8,6 +8,11 @@ BONUS_COLOR = (0, 255, 25)
 LITTLE_BONUS_COLOR = (242, 245, 39)
 GRILLE_COLOR = (0, 0, 0)
 
+DROITE = 0
+HAUT = 1
+GAUCHE = 2
+BAS = 3
+
 class Grille:
     def __init__(self):
         pygame.init()
@@ -34,22 +39,25 @@ class Grille:
         self.yt = (self.h - (self.nb_cases_y * self.t_cases)) // 2
 
         self.t_robot = self.t_cases // 2
+        self.coord_robot = (0, 0)
 
         self.grille = [(i, j) for i in range(self.nb_cases_x) for j in range(self.nb_cases_y)]
+
+        self.gain = 0
 
         pygame.display.set_caption("Robot chercheur")
         self.clock = pygame.time.Clock()
 
         
 
-    def affichage(self):
-        self.screen.fill(BACKGROUND_COLOR)
+    def affichage(self, coords):
+        
         self.dessiner_grille()
-        self.dessiner_robot()
+        #self.dessiner_robot(coords)
         self.dessiner_malus()
         self.dessiner_little_bonus()
         self.dessiner_bonus()
-        pygame.display.flip()
+        
 
     def dessiner_grille(self):
 
@@ -64,10 +72,10 @@ class Grille:
 
             pygame.draw.line(self.screen, GRILLE_COLOR, debut_ligne_hor, fin_ligne_hor, int(1/10*self.t_cases))
 
-    def dessiner_robot(self, x_grid=0, y_grid=0):
+    def dessiner_robot(self, coords):
 
-        center_x = self.xt + (x_grid * self.t_cases) + (self.t_cases // 2)
-        center_y = self.yt + (y_grid * self.t_cases) + (self.t_cases // 2)
+        center_x = self.xt + (coords[0] * self.t_cases) + (self.t_cases // 2)
+        center_y = self.yt + (coords[1] * self.t_cases) + (self.t_cases // 2)
 
         pt_1 = (center_x - (self.t_robot // 2), center_y + (self.t_robot // 2))
         pt_2 = (center_x + (self.t_robot // 2), center_y + (self.t_robot // 2))
@@ -76,10 +84,14 @@ class Grille:
 
         pygame.draw.polygon(self.screen, ROBOT_COLOR, [pt_1, pt_2, pt_3])
 
+        self.coord_robot = (coords[0], coords[1])
+
     def dessiner_malus(self):
         x1, y1 = 1, 1
         x2, y2 = 3, 2
         x3, y3 = 1, 3
+
+        self.coord_malus  = [(x1, y1), (x2, y2), (x3, y3)]
 
         center_x1 = self.xt + (x1 * self.t_cases) + (self.t_cases // 2)
         center_y1 = self.yt + (y1 * self.t_cases) + (self.t_cases // 2)
@@ -108,10 +120,13 @@ class Grille:
 
     def dessiner_little_bonus(self):
 
+        x, y = 2, 2
+        self.coord_little_bonus = [(x, y)]
+
         taille = self.t_cases // 3
 
-        cx = self.xt + (2 * self.t_cases) + (self.t_cases // 2) - (taille // 2)
-        cy = self.yt + (2 * self.t_cases) + (self.t_cases // 2) - (taille // 2)
+        cx = self.xt + (x * self.t_cases) + (self.t_cases // 2) - (taille // 2)
+        cy = self.yt + (y * self.t_cases) + (self.t_cases // 2) - (taille // 2)
         
         pygame.draw.rect(self.screen, LITTLE_BONUS_COLOR, (cx, cy, taille, taille))
     
@@ -119,6 +134,7 @@ class Grille:
     def dessiner_bonus(self):
 
         x, y = 4, 4
+        self.coord_bonus = [(x, y)]
         center_x = self.xt + (x * self.t_cases) + (self.t_cases // 2)
         center_y = self.yt + (y * self.t_cases) + (self.t_cases // 2)
 
@@ -128,19 +144,58 @@ class Grille:
         self.gain = 0
         self.dessiner_robot()
 
-    def step(self):
-        pass
+    def step(self, action):
+        if action == DROITE:
+            new_coord_robot = (self.coord_robot[0]+1, self.coord_robot[1])
+            reward = self.faire_action(new_coord_robot)
+        elif action == HAUT:
+            new_coord_robot = (self.coord_robot[0], self.coord_robot[1]+1)
+            reward = self.faire_action(new_coord_robot)
+        elif action == GAUCHE:
+            new_coord_robot = (self.coord_robot[0]-1, self.coord_robot[1])
+            reward = self.faire_action(new_coord_robot)
+        elif action == BAS:
+            new_coord_robot = (self.coord_robot[0], self.coord_robot[1]-1)
+            reward = self.faire_action(new_coord_robot)
+
+
+    def faire_action(self, new_coord_robot):
+        if self.est_dans_limites(new_coord_robot[0], new_coord_robot[1]):
+                self.dessiner_robot(new_coord_robot)
+                
+                return self.give_reward(new_coord_robot)
+        else:
+            return -1
+            print(f"Mouvement impossible.")
+
+
+    def est_dans_limites(self, x, y):
+        return (x >= 0 and x < self.nb_cases_x and y >= 0 and y < self.nb_cases_y) 
+            
+    def give_reward(self, coords):
+        if coords in self.coord_bonus:
+            reward = 150
+        elif coords in self.coord_little_bonus:
+            reward = 10
+        elif coords in self.coord_malus:
+            reward = -10
+        else:
+            reward = -1
         
+        return reward
+
     
 
-
-        
 
 
 if __name__ == "__main__":
     grille = Grille()
-    running = True
+    
+    running = True  
     while running:
+        
+        grille.screen.fill(BACKGROUND_COLOR)
+        grille.affichage(grille.coord_robot)
         # 1. On écoute le système (évite que la fenêtre "plante")
         for event in pygame.event.get():
             # Permet de fermer la fenêtre avec la croix (si on n'est pas en plein écran)
@@ -151,6 +206,8 @@ if __name__ == "__main__":
                 if event.key == pygame.K_ESCAPE:
                     running = False
     
-        grille.affichage()
-        grille.clock.tick(15)
+        
+        grille.step(0)
+        grille.clock.tick(5)
+        pygame.display.flip()
         
