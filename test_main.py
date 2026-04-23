@@ -8,9 +8,13 @@ import pygame
 if __name__ == "__main__":
 
     grille = Grille()
+
+    ## Choix coords b, m, lb
+    grille.choisir_coord_grille()
+
     robot = Robot()
     
-    nb_essais = 1000
+    nb_essais = 5000
     nb_pas_max = 10
     game_over = False
 
@@ -31,7 +35,7 @@ if __name__ == "__main__":
                         pygame.quit()
                         exit()
             
-            if essai > nb_essais-1:
+            if essai > nb_essais-2:
                 grille.affichage(grille.coord_robot)
                 grille.clock.tick(10)
 
@@ -44,8 +48,6 @@ if __name__ == "__main__":
 
             etat, rwd = grille.step(action)
 
-
-
             Gain += rwd
             
             if nb_pas > nb_pas_max:
@@ -53,6 +55,10 @@ if __name__ == "__main__":
 
             if grille.coord_robot == (4, 4):
                 liste_partie.append(essai)
+
+            if essai > nb_essais-10:
+                grille.affichage(grille.coord_robot)
+                grille.clock.tick(3)
 
             
             robot.update_Q_table(etat0, action, rwd, etat, game_over)
@@ -65,6 +71,7 @@ if __name__ == "__main__":
             res = round(len(resultats)/nb_essais * 100, 1)
             print(res)
         
+        # print(f"partie {essai}/{nb_essais}. Gain total : {int(Gain)}")
         grille.reset()
         if robot.epsilon > robot.epsilon_min:
             robot.epsilon -= robot.epsilon_minus

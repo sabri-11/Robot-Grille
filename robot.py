@@ -5,7 +5,7 @@ class Robot:
         self.Q_table = {}
         self.gamma = 0.9    # importance du futur, très important pour aller vers gros bonus
         self.alpha = 0.1      # besoin de bcp d'essais pour adopter une bonne route, pas très influençable par le little bonus
-        self.epsilon = 0.5      # 1/2 chance de faire action random au départ poru explorer presque partout
+        self.epsilon = 1      # 1/2 chance de faire action random au départ poru explorer presque partout
         self.epsilon_min = 0.01  # tendre vers un epsilon très petit pour avoir très peu de hasard une fois le chemin optimal trouvé. (mieux 0.01 que 0.05 pour 1000 et 10 000 essais)
         self.epsilon_minus = 0.0005  # faire baisser epsilon très doucement mais pas trop (0.0005 mieux que 0.0001 pour 1000 et 10 000 essais)
 

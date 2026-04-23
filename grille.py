@@ -190,6 +190,30 @@ class Grille:
             reward = -1
         
         return reward
+    
+    # pour tests
+    def choisir_coord_grille(self):
+        # self.coord_bonus[0] = (int(input("x bonus : ")), int(input("y bonus : ")))
+    
+        # self.coord_little_bonus[0] = (int(input("x little bonus : ")), int(input("y little bonus : ")))
+
+
+        # x1 = int(input("x malus 1 : "))
+        # y1 = int(input("y malus 1 : "))
+        # x2 = int(input("x malus 2 : "))
+        # y2 = int(input("y malus 2 : "))
+        # x3 = int(input("x malus 3 : "))
+        # y3 = int(input("y malus 3 : "))
+
+        # self.coord_malus = [(x1, y1), (x2, y2), (x3, y3)]
+
+        self.coord_bonus[0] = (0, 4)
+    
+        self.coord_little_bonus[0] = (3, 0)
+
+        self.coord_malus = [(0, 3), (1, 3), (1, 4)]
+
+        
 
     
 
