@@ -5,7 +5,9 @@ class Robot:
         self.Q_table = {}
         self.gamma = 0.8
         self.alpha = 0.1
-        self.epsilon = 0.15
+        self.epsilon = 0.5
+        self.epsilon_min = 0.05 # tendre vers ub epsilon très petit pour avoir très peu de hasard une fois le chemin optimal trouvé. 
+        self.epsilon_minus = 0.001  # faire baisser epsilon très doucement 
 
     def get_action(self, etat):
         if etat not in self.Q_table:

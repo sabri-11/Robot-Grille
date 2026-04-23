@@ -65,12 +65,13 @@ class Grille:
         
 
     def affichage(self, coords):
-        
+        self.screen.fill(BACKGROUND_COLOR)
         self.dessiner_grille()
         self.dessiner_robot(coords)
         self.dessiner_malus(self.coord_malus[0], self.coord_malus[1], self.coord_malus[2])
         self.dessiner_little_bonus(self.coord_little_bonus[0])
         self.dessiner_bonus(self.coord_bonus[0])
+        pygame.display.flip()
         
 
     def dessiner_grille(self):
@@ -95,7 +96,6 @@ class Grille:
         pt_2 = (center_x + (self.t_robot // 2), center_y + (self.t_robot // 2))
         pt_3 = (center_x, center_y - (self.t_robot // 2))
         
-
         pygame.draw.polygon(self.screen, ROBOT_COLOR, [pt_1, pt_2, pt_3])
 
 
@@ -146,7 +146,9 @@ class Grille:
 
     def reset(self):
         self.gain = []
-        self.dessiner_robot((0, 0))
+        self.coord_robot = (0, 0)
+        self.affichage(self.coord_robot)
+        
 
     def step(self, action):
         if action == DROITE:
@@ -180,7 +182,7 @@ class Grille:
             
     def give_reward(self, coords):
         if coords in self.coord_bonus:
-            reward = 150
+            reward = 300
         elif coords in self.coord_little_bonus:
             reward = 10
         elif coords in self.coord_malus:
