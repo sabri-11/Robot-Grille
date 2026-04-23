@@ -43,7 +43,6 @@ class Grille:
 
         self.grille = [(i, j) for i in range(self.nb_cases_x) for j in range(self.nb_cases_y)]
 
-        self.gain = []
 
         ## Malus 
         m1 = (1, 1)
@@ -145,7 +144,7 @@ class Grille:
         pygame.draw.circle(self.screen, BONUS_COLOR, (center_x, center_y), self.t_robot // 2)
 
     def reset(self):
-        self.gain = []
+
         self.coord_robot = (0, 0)
         self.affichage(self.coord_robot)
         
